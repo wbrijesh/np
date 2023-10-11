@@ -97,7 +97,7 @@ function create_go_project() {
 
 function create_nextjs_project() {
   echo "Creating new Next.js project"
-  pnpm create next-app@latest $name
+  pnpm create next-app@latest $name --ts --eslint --tailwind --no-src-dir --no-app --import-alias '@/*'
 }
 
 function create_shell_script_project() {
@@ -127,7 +127,18 @@ function project_type() {
 function start_tmux_session() {
   open "https://github.com/wbrijesh/$name"
   cd $name
-  tmux new -s $name
+  
+  if [[ "$project_type" == "Rust" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'cargo run' C-m \; attach-session
+  elif [[ "$project_type" == "Go" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'go run main.go' C-m \; attach-session
+  elif [[ "$project_type" == "Next.js" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'pnpm run dev' C-m \; attach-session
+  elif [[ "$project_type" == "Shell script" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys "sh $name.sh" C-m \; attach-session
+  else
+    echo "Invalid project type"
+  fi
 }
 
 
