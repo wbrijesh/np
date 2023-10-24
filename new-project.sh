@@ -2,7 +2,6 @@
 
 function project_name() {
   name=$(enquirer input -m "Name of the project" -d "project_name")
-  echo "you chose the name $name"
 }
 
 function go_to_project() {
@@ -86,6 +85,15 @@ function create_rust_project() {
   cargo new $name
 }
 
+function create_starter_project() {
+  echo "Creating new Starter project"
+  git clone https://github.com/wbrijesh/starter $name
+  cd $name
+  rm -rf .git
+  cd ../
+}
+
+
 function create_go_project() {
   echo "Creating new Go project"
   mkdir $name
@@ -109,10 +117,12 @@ function create_shell_script_project() {
 }
 
 function project_type() {
-  project_type=$(enquirer select -m "Type of project" -c "Rust" "Go" "Next.js" "Shell script")
+  project_type=$(enquirer select -m "Type of project" -c "Rust" "Starter" "Go" "Next.js" "Shell script")
 
   if [[ "$project_type" == "Rust" ]]; then
     create_rust_project
+  elif [[ "$project_type" == "Starter" ]]; then
+    create_starter_project
   elif [[ "$project_type" == "Go" ]]; then
     create_go_project
   elif [[ "$project_type" == "Next.js" ]]; then
@@ -130,6 +140,8 @@ function start_tmux_session() {
   
   if [[ "$project_type" == "Rust" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'cargo run' C-m \; attach-session
+  elif [[ "$project_type" == "Starter" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'echo "Manually build and run docker containers if you would like to"' C-m \; attach-session
   elif [[ "$project_type" == "Go" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'go run main.go' C-m \; attach-session
   elif [[ "$project_type" == "Next.js" ]]; then
