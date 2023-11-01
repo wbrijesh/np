@@ -27,6 +27,13 @@ function project_location() {
   go_to_project
 }
 
+function project_license() {
+  license=$(enquirer select -m "Select a license type" -c "None" "Proprietary" "BSD" "GNU General Public")
+
+  # add_license
+}
+
+
 function verify_availability() {
   if [[ "$location" == "Archives" ]]; then
     path="/Users/brijesh/Developer/archives/$name"
@@ -176,6 +183,8 @@ function main() {
   verify_availability
 
   project_type
+
+  # project_license
 
   initiate_git_repo
   
