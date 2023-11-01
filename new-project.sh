@@ -105,7 +105,7 @@ function create_go_project() {
 
 function create_nextjs_project() {
   echo "Creating new Next.js project"
-  pnpm create next-app@latest $name --ts --eslint --tailwind --no-src-dir --no-app --import-alias '@/*'
+  pnpm create next-app@latest $name --ts --eslint --tailwind --no-src-dir --app --import-alias '@/*'
 }
 
 function create_shell_script_project() {
@@ -114,21 +114,33 @@ function create_shell_script_project() {
   cd $name
   touch $name.sh
   chmod +x $name.sh
+  cd ../
 }
 
-function project_type() {
-  project_type=$(enquirer select -m "Type of project" -c "Rust" "Starter" "Go" "Next.js" "Shell script")
+function create_empty_project() {
+  echo "Creating new Empty Script"
+  mkdir $name
+  cd $name
+  touch README.md
+  cd ../
+}
 
-  if [[ "$project_type" == "Rust" ]]; then
+
+function project_type() {
+  project_type=$(enquirer select -m "Type of project" -c "Start from scratch" "Plain Rust binary target" "Fullstack Starter" "Plain Go binary target" "Plain Next.js with app router" "Shell script")
+
+  if [[ "$project_type" == "Plain Rust binary target" ]]; then
     create_rust_project
-  elif [[ "$project_type" == "Starter" ]]; then
+  elif [[ "$project_type" == "Fullstack Starter" ]]; then
     create_starter_project
-  elif [[ "$project_type" == "Go" ]]; then
+  elif [[ "$project_type" == "Plain Go binary target" ]]; then
     create_go_project
-  elif [[ "$project_type" == "Next.js" ]]; then
+  elif [[ "$project_type" == "Plain Next.js with app router" ]]; then
     create_nextjs_project
   elif [[ "$project_type" == "Shell script" ]]; then
     create_shell_script_project
+  elif [[ "$project_type" == "Start from scratch" ]]; then
+    create_empty_project
   else
     echo "Invalid project type"
   fi
@@ -138,16 +150,18 @@ function start_tmux_session() {
   open "https://github.com/wbrijesh/$name"
   cd $name
   
-  if [[ "$project_type" == "Rust" ]]; then
+  if [[ "$project_type" == "Plain Rust binary target" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'cargo run' C-m \; attach-session
-  elif [[ "$project_type" == "Starter" ]]; then
+  elif [[ "$project_type" == "Fullstack Starter" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'echo "Manually build and run docker containers if you would like to"' C-m \; attach-session
-  elif [[ "$project_type" == "Go" ]]; then
+  elif [[ "$project_type" == "Plain Go binary target" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'go run main.go' C-m \; attach-session
   elif [[ "$project_type" == "Next.js" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys 'pnpm run dev' C-m \; attach-session
   elif [[ "$project_type" == "Shell script" ]]; then
     tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys "sh $name.sh" C-m \; attach-session
+  elif [[ "$project_type" == "Start from scratch" ]]; then
+    tmux new-session -s $name \; send-keys 'nvim .' C-m \; new-window \; send-keys "echo 'Start building project from scratch here'" C-m \; attach-session
   else
     echo "Invalid project type"
   fi
